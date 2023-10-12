@@ -1,5 +1,6 @@
 package com.huawei.cloud.transfer.obs;
 
+import com.huawei.cloud.obs.TestFunctions;
 import com.obs.services.ObsClient;
 import org.eclipse.edc.junit.annotations.EndToEndTest;
 import org.jetbrains.annotations.NotNull;
@@ -14,6 +15,13 @@ class ObsDataSinkOtcTest extends ObsDataSinkTestBase {
     public static final String OTC_CLOUD_URL = "https://obs.eu-de.otc.t-systems.com";
     public static final String BUCKET_NAME = "obs-sink-itest-" + UUID.randomUUID();
     private ObsClient obsClient;
+
+    @AfterEach
+    void cleanup() {
+        getObsClient().listObjects(BUCKET_NAME).getObjects()
+                .forEach(obj -> getObsClient().deleteObject(BUCKET_NAME, obj.getObjectKey()));
+        getObsClient().deleteBucket(BUCKET_NAME);
+    }
 
     @NotNull
     @Override
@@ -30,12 +38,5 @@ class ObsDataSinkOtcTest extends ObsDataSinkTestBase {
             obsClient = TestFunctions.createClient(OTC_CLOUD_URL);
         }
         return obsClient;
-    }
-
-    @AfterEach
-    void cleanup() {
-        getObsClient().listObjects(BUCKET_NAME).getObjects()
-                .forEach(obj -> getObsClient().deleteObject(BUCKET_NAME, obj.getObjectKey()));
-        getObsClient().deleteBucket(BUCKET_NAME);
     }
 }
