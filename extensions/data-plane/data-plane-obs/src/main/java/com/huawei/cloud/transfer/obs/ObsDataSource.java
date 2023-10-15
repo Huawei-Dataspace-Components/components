@@ -19,10 +19,28 @@ import java.util.stream.Stream;
 import static org.eclipse.edc.connector.dataplane.spi.pipeline.StreamResult.failure;
 import static org.eclipse.edc.connector.dataplane.spi.pipeline.StreamResult.success;
 
+/**
+ * The {@code ObsDataSource} class is an implementation of the {@code DataSource} interface
+ * that provides a way to access data stored in the OBS (Huawei Object Storage Service).
+ * <p>
+ * This class supports opening a stream of data parts by listing OBS objects with a given prefix
+ * and creating {@code ObsPart} instances for each object. It also provides a way to close the
+ * connection to the OBS.
+ * <p>
+ * Example usage:
+ * ObsDataSource source = ObsDataSource.Builder.newInstance()
+ * .client(obsClient)
+ * .bucketName(bucketName)
+ * .keyPrefix("prefix")
+ * .build();
+ * StreamResult<Stream<Part>> streamResult = source.openPartStream();
+ * <p>
+ * Note: The usage example assumes that there is a configured ObsClient, a valid bucketName,
+ * and a optional prefix for the OBS objects.
+ */
 public class ObsDataSource implements DataSource {
     private ObsClient client;
     private String bucketName;
-    private String keyName;
     private String keyPrefix;
 
     @Override
@@ -94,11 +112,6 @@ public class ObsDataSource implements DataSource {
 
         public Builder bucketName(String bucketName) {
             source.bucketName = bucketName;
-            return this;
-        }
-
-        public Builder keyName(String keyName) {
-            source.keyName = keyName;
             return this;
         }
 

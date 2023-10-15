@@ -58,7 +58,6 @@ abstract class ObsDataSourceTestBase {
                 .client(getClient())
                 .bucketName(bucketName)
                 .keyPrefix("f")
-                .keyName("file1.txt")
                 .build();
 
         var str = source.openPartStream();
@@ -82,7 +81,6 @@ abstract class ObsDataSourceTestBase {
                 .client(getClient())
                 .bucketName(bucketName)
                 .keyPrefix("xyz")
-                .keyName("file1.txt")
                 .build();
 
         str = source.openPartStream();
@@ -99,7 +97,6 @@ abstract class ObsDataSourceTestBase {
                 .client(getClient())
                 .bucketName(bucketName)
                 .keyPrefix("f")
-                .keyName("file1.txt")
                 .build();
 
         str = source.openPartStream();
@@ -118,7 +115,6 @@ abstract class ObsDataSourceTestBase {
         var source = ObsDataSource.Builder.newInstance()
                 .client(getClient())
                 .bucketName(bucketName)
-                .keyName("file1.txt")
                 .build();
 
         str = source.openPartStream();
@@ -133,7 +129,6 @@ abstract class ObsDataSourceTestBase {
         var source = ObsDataSource.Builder.newInstance()
                 .client(getClient())
                 .bucketName(bucketName)
-                .keyName("file1.txt")
                 .build();
 
         str = source.openPartStream();
