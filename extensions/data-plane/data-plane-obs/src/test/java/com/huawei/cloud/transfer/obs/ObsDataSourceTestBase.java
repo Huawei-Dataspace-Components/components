@@ -37,6 +37,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.eclipse.edc.junit.testfixtures.TestUtils.getFileFromResourceName;
 
+@SuppressWarnings("ALL") // try-with-resources is not needed here
 @EndToEndTest
 @Testcontainers
 abstract class ObsDataSourceTestBase {

@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.TestInfo;
 
+import java.io.IOException;
 import java.util.UUID;
 
 public class ObsDataSourceOtcTest extends ObsDataSourceTestBase {
@@ -56,5 +57,10 @@ public class ObsDataSourceOtcTest extends ObsDataSourceTestBase {
                 .getObjects()
                 .forEach(obj -> getClient().deleteObject(BUCKET_NAME, obj.getObjectKey()));
         obsClient.deleteBucket(BUCKET_NAME);
+        try {
+            obsClient.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
