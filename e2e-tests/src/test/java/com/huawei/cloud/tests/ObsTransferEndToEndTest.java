@@ -98,7 +98,7 @@ public class ObsTransferEndToEndTest {
 
         consumerClient.createBucket(destBucket);
 
-        var flowRequest = createFlowRequest(destBucket, consumerEndpoint, srcBucket, TESTFILE_NAME, providerEndpoint);
+        var flowRequest = createFlowRequest(destBucket, consumerEndpoint, srcBucket, TESTFILE_NAME, providerEndpoint).build();
         var url = PROVIDER.getControlEndpoint().getUrl().toString() + "/transfer";
 
         given().when()
@@ -117,7 +117,42 @@ public class ObsTransferEndToEndTest {
                         .allSatisfy(obsObject -> assertThat(obsObject.getMetadata().getContentLength()).isEqualTo(fileSize)));
     }
 
-    private DataFlowRequest createFlowRequest(String consumerBucket, String consumerEndpoint, String providerBucket, String providerObjectKey, String providerEndpoint) {
+    @Test
+    void transfer_multipleFilesWithPrefix() throws IOException {
+        var id = UUID.randomUUID().toString();
+        var srcBucket = "src-" + id;
+        var destBucket = "dest-" + id;
+        providerClient.createBucket(srcBucket);
+        var f = getFileFromResourceName(TESTFILE_NAME);
+        providerClient.putObject(srcBucket, "file1.json", f);
+        providerClient.putObject(srcBucket, "file2.json", f);
+        providerClient.putObject(srcBucket, "file3.json", f);
+        var fileSize = Files.size(f.toPath());
+
+        consumerClient.createBucket(destBucket);
+
+        var flowRequest = createFlowRequest(destBucket, consumerEndpoint, srcBucket, "file", providerEndpoint).build();
+        var url = PROVIDER.getControlEndpoint().getUrl().toString() + "/transfer";
+
+        given().when()
+                .baseUri(url)
+                .contentType(ContentType.JSON)
+                .body(flowRequest)
+                .post()
+                .then()
+                .statusCode(200);
+
+        await().pollInterval(Duration.ofSeconds(2))
+                .atMost(Duration.ofSeconds(60))
+                .untilAsserted(() -> assertThat(consumerClient.listObjects(destBucket).getObjects())
+                        .isNotEmpty()
+                        .hasSize(3)
+                        .allSatisfy(obsObject -> assertThat(obsObject.getObjectKey()).startsWith("file"))
+                        .allSatisfy(obsObject -> assertThat(obsObject.getObjectKey()).endsWith(".json"))
+                        .allSatisfy(obsObject -> assertThat(obsObject.getMetadata().getContentLength()).isEqualTo(fileSize)));
+    }
+
+    private DataFlowRequest.Builder createFlowRequest(String consumerBucket, String consumerEndpoint, String providerBucket, String providerObjectKey, String providerEndpoint) {
         return DataFlowRequest.Builder.newInstance()
                 .id("test-request")
                 .sourceDataAddress(DataAddress.Builder.newInstance()
@@ -140,8 +175,7 @@ public class ObsTransferEndToEndTest {
                         .build()
                 )
                 .processId("test-process-id")
-                .trackable(false)
-                .build();
+                .trackable(false);
     }
 
 }

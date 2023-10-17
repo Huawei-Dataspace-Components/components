@@ -22,7 +22,6 @@
 package com.huawei.cloud.transfer.obs;
 
 import com.huawei.cloud.obs.ObsBucketSchema;
-import org.eclipse.edc.junit.annotations.EndToEndTest;
 import org.eclipse.edc.junit.assertions.AbstractResultAssert;
 import org.eclipse.edc.spi.EdcException;
 import org.eclipse.edc.spi.security.Vault;
@@ -46,7 +45,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@EndToEndTest
 class ObsDataSinkFactoryTest {
 
     private final Vault vaultMock = mock();

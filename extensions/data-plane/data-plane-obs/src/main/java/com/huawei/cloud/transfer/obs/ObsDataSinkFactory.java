@@ -46,7 +46,6 @@ public class ObsDataSinkFactory extends ObsFactory implements DataSinkFactory {
         var obsClient = createObsClient(destination);
         return ObsDataSink.Builder.newInstance()
                 .bucketName(destination.getStringProperty(ObsBucketSchema.BUCKET_NAME))
-                .objectName(destination.getKeyName())
                 .monitor(monitor)
                 .executorService(executorService)
                 .requestId(request.getId())
