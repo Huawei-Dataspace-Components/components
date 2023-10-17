@@ -102,6 +102,7 @@ class ObsDataSinkFactoryTest {
         var dest = dataAddressWithoutCredentials();
         when(vaultMock.resolveSecret("aKey")).thenReturn("""
                 {
+                  "edctype": "dataspaceconnector:obssecrettoken",
                   "ak": "test-ak",
                   "sk": "test-sk"
                 }

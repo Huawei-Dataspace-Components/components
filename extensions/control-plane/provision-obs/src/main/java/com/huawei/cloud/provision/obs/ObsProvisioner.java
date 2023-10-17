@@ -2,7 +2,7 @@ package com.huawei.cloud.provision.obs;
 
 
 import com.huawei.cloud.obs.ObsClientProvider;
-import com.huawei.cloud.obs.ObsTemporarySecretToken;
+import com.huawei.cloud.obs.ObsSecretToken;
 import com.huaweicloud.sdk.iam.v3.model.Credential;
 import dev.failsafe.RetryPolicy;
 import org.eclipse.edc.connector.transfer.spi.provision.Provisioner;
@@ -76,7 +76,7 @@ public class ObsProvisioner implements Provisioner<ObsResourceDefinition, ObsPro
 
 
         var expiration = Instant.parse(credentials.getExpiresAt());
-        var secretToken = new ObsTemporarySecretToken(credentials.getAccess(), credentials.getSecret(), credentials.getSecuritytoken(), expiration.toEpochMilli());
+        var secretToken = new ObsSecretToken(credentials.getAccess(), credentials.getSecret(), credentials.getSecuritytoken(), expiration.toEpochMilli());
 
         monitor.debug("ObsBucketProvisioner: Bucket request submitted: " + resourceDefinition.getBucketName());
         var response = ProvisionResponse.Builder.newInstance().resource(resource).secretToken(secretToken).build();

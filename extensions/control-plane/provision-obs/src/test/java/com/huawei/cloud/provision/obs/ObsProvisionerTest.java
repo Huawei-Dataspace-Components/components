@@ -15,7 +15,7 @@
 package com.huawei.cloud.provision.obs;
 
 import com.huawei.cloud.obs.ObsClientProvider;
-import com.huawei.cloud.obs.ObsTemporarySecretToken;
+import com.huawei.cloud.obs.ObsSecretToken;
 import com.huaweicloud.sdk.iam.v3.IamClient;
 import com.huaweicloud.sdk.iam.v3.model.CreateTemporaryAccessKeyByTokenResponse;
 import com.huaweicloud.sdk.iam.v3.model.Credential;
@@ -90,9 +90,9 @@ class ObsProvisionerTest {
         var response = provisioner.provision(definition, policy).join().getContent();
 
         assertThat(response.getResource()).isInstanceOf(ObsProvisionedResource.class);
-        assertThat(response.getSecretToken()).isInstanceOfSatisfying(ObsTemporarySecretToken.class, secretToken -> {
-            assertThat(secretToken.access()).isEqualTo("accessKeyId");
-            assertThat(secretToken.secret()).isEqualTo("secretAccessKey");
+        assertThat(response.getSecretToken()).isInstanceOfSatisfying(ObsSecretToken.class, secretToken -> {
+            assertThat(secretToken.ak()).isEqualTo("accessKeyId");
+            assertThat(secretToken.sk()).isEqualTo("secretAccessKey");
             assertThat(secretToken.securityToken()).isEqualTo("sessionToken");
         });
         verify(iamClient).createTemporaryAccessKeyByToken(any());

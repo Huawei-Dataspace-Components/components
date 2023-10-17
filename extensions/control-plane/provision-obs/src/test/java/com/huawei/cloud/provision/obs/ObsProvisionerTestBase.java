@@ -1,7 +1,7 @@
 package com.huawei.cloud.provision.obs;
 
 import com.huawei.cloud.obs.ObsClientProvider;
-import com.huawei.cloud.obs.ObsTemporarySecretToken;
+import com.huawei.cloud.obs.ObsSecretToken;
 import com.huaweicloud.sdk.iam.v3.IamClient;
 import com.obs.services.ObsClient;
 import com.obs.services.model.ObjectMetadata;
@@ -55,7 +55,7 @@ public abstract class ObsProvisionerTestBase {
 
         assertThat(result.succeeded()).isTrue();
 
-        var newClient = getObsClient((ObsTemporarySecretToken) result.getContent().getSecretToken());
+        var newClient = getObsClient((ObsSecretToken) result.getContent().getSecretToken());
 
 
         putObject(newClient, bucketName, objectName);
@@ -107,7 +107,7 @@ public abstract class ObsProvisionerTestBase {
 
     protected abstract ObsClient getObsClient();
 
-    protected abstract ObsClient getObsClient(ObsTemporarySecretToken token);
+    protected abstract ObsClient getObsClient(ObsSecretToken token);
 
     protected abstract IamClient getIamClient();
 

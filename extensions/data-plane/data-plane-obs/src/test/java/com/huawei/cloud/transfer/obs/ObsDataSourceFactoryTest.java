@@ -94,6 +94,7 @@ class ObsDataSourceFactoryTest {
         var source = dataAddressWithoutCredentials();
         when(vault.resolveSecret("aKey")).thenReturn("""
                 {
+                  "edctype": "dataspaceconnector:obssecrettoken",
                   "ak": "test-ak",
                   "sk": "test-sk"
                 }

@@ -1,6 +1,6 @@
 package com.huawei.cloud.provision.obs;
 
-import com.huawei.cloud.obs.ObsTemporarySecretToken;
+import com.huawei.cloud.obs.ObsSecretToken;
 import com.huawei.cloud.obs.OtcTest;
 import com.huawei.cloud.obs.TestFunctions;
 import com.huaweicloud.sdk.iam.v3.IamClient;
@@ -38,7 +38,7 @@ public class ObsProvisionerOtcTest extends ObsProvisionerTestBase {
 
         assertThat(result.succeeded()).isTrue();
 
-        var newClient = getObsClient((ObsTemporarySecretToken) result.getContent().getSecretToken());
+        var newClient = getObsClient((ObsSecretToken) result.getContent().getSecretToken());
 
         assertThatThrownBy(() -> newClient.listObjects(bucketName))
                 .isInstanceOf(ObsException.class)
@@ -67,15 +67,15 @@ public class ObsProvisionerOtcTest extends ObsProvisionerTestBase {
     }
 
     @Override
+    protected ObsClient getObsClient(ObsSecretToken token) {
+        return TestFunctions.createClient(token, OBS_OTC_CLOUD_URL);
+    }
+
+    @Override
     protected IamClient getIamClient() {
         var accessKey = System.getenv(ObsConstraint.ACCESS_KEY_ENV_VAR).trim();
         var secretKey = System.getenv(ObsConstraint.SECRET_KEY_ENV_VAR).trim();
         return TestFunctions.createIamClient(accessKey, secretKey, IAM_OTC_CLOUD_URL);
-    }
-
-    @Override
-    protected ObsClient getObsClient(ObsTemporarySecretToken token) {
-        return TestFunctions.createClient(token, OBS_OTC_CLOUD_URL);
     }
 
     protected ObsClient getObsClient(String ak, String sk) {

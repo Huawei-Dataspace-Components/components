@@ -1,6 +1,6 @@
 package com.huawei.cloud.provision.obs;
 
-import com.huawei.cloud.obs.ObsTemporarySecretToken;
+import com.huawei.cloud.obs.ObsSecretToken;
 import com.huawei.cloud.obs.TestFunctions;
 import com.huaweicloud.sdk.iam.v3.IamClient;
 import com.huaweicloud.sdk.iam.v3.model.CreateTemporaryAccessKeyByTokenResponse;
@@ -39,11 +39,6 @@ public class ObsProvisionerMinioTest extends ObsProvisionerTestBase {
     }
 
     @Override
-    protected ObsClient getObsClient(ObsTemporarySecretToken token) {
-        return getObsClient(token.access(), token.secret());
-    }
-
-    @Override
     protected IamClient getIamClient() {
         var client = TestFunctions.createIamClient(USER, PASSWORD, url());
         client = spy(client);
@@ -58,6 +53,11 @@ public class ObsProvisionerMinioTest extends ObsProvisionerTestBase {
                 .when(client)
                 .createTemporaryAccessKeyByToken(any());
         return client;
+    }
+
+    @Override
+    protected ObsClient getObsClient(ObsSecretToken token) {
+        return getObsClient(token.ak(), token.sk());
     }
 
     protected ObsClient getObsClient(String ak, String sk) {

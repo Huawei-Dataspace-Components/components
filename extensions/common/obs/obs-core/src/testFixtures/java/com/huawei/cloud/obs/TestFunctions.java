@@ -29,10 +29,10 @@ public class TestFunctions {
         return new ObsClient(new BasicObsCredentialsProvider(ak, sk), config);
     }
 
-    public static ObsClient createClient(ObsTemporarySecretToken secretToken, String endpoint) {
+    public static ObsClient createClient(ObsSecretToken secretToken, String endpoint) {
         var config = createConfig(endpoint);
 
-        return new ObsClient(new BasicObsCredentialsProvider(secretToken.access(), secretToken.secret(), secretToken.securityToken()), config);
+        return new ObsClient(new BasicObsCredentialsProvider(secretToken.ak(), secretToken.sk(), secretToken.securityToken()), config);
     }
 
     public static ObsConfiguration createConfig(String endpoint) {
