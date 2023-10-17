@@ -19,7 +19,7 @@
  *
  */
 
-package com.huawei.cloud.transfer.obs;
+package com.huawei.cloud.obs;
 
 import org.eclipse.edc.junit.annotations.IntegrationTest;
 import org.junit.jupiter.api.Tag;

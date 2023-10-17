@@ -1,12 +1,12 @@
 package com.huawei.cloud.provision.obs;
 
 import com.huawei.cloud.obs.ObsTemporarySecretToken;
+import com.huawei.cloud.obs.OtcTest;
 import com.huawei.cloud.obs.TestFunctions;
 import com.huaweicloud.sdk.iam.v3.IamClient;
 import com.obs.services.ObsClient;
 import com.obs.services.exception.ObsException;
 import com.obs.services.internal.ObsConstraint;
-import org.eclipse.edc.junit.annotations.EndToEndTest;
 import org.eclipse.edc.policy.model.Policy;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +16,7 @@ import java.util.concurrent.ExecutionException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@EndToEndTest
+@OtcTest
 public class ObsProvisionerOtcTest extends ObsProvisionerTestBase {
 
     private static final String OBS_OTC_CLOUD_URL = "https://obs.eu-de.otc.t-systems.com";

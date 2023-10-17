@@ -13,4 +13,6 @@ dependencies {
     testImplementation(libs.assertj)
     testFixturesApi(libs.huawei.obs)
     testFixturesApi(libs.huawei.iam)
+    testFixturesApi(libs.edc.junit)
+    testFixturesApi(libs.junit.jupiter.api)
 }
