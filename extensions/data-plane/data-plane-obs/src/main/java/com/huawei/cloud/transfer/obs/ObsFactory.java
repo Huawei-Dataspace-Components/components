@@ -27,6 +27,7 @@ import com.obs.services.BasicObsCredentialsProvider;
 import com.obs.services.EnvironmentVariableObsCredentialsProvider;
 import com.obs.services.IObsCredentialsProvider;
 import com.obs.services.ObsClient;
+import com.obs.services.ObsConfiguration;
 import org.eclipse.edc.connector.dataplane.util.validation.ValidationRule;
 import org.eclipse.edc.spi.security.Vault;
 import org.eclipse.edc.spi.types.TypeManager;
@@ -50,6 +51,9 @@ public abstract class ObsFactory {
         var endpoint = dataAddress.getStringProperty(ENDPOINT);
         var secret = vault.resolveSecret(dataAddress.getKeyName());
         IObsCredentialsProvider provider;
+        var config = new ObsConfiguration();
+        config.setPathStyle(true); //otherwise the bucketname gets prepended
+        config.setEndPoint(endpoint);
 
         if (secret != null) { // AK/SK was stored in vault ->interpret secret as JSON
             var token = typeManager.readValue(secret, ObsSecretToken.class);
@@ -62,6 +66,6 @@ public abstract class ObsFactory {
             provider = new EnvironmentVariableObsCredentialsProvider();
         }
 
-        return new ObsClient(provider, endpoint);
+        return new ObsClient(provider, config);
     }
 }

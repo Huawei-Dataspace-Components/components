@@ -29,7 +29,7 @@ import org.junit.jupiter.api.TestInfo;
 import java.io.IOException;
 import java.util.UUID;
 
-public class ObsDataSourceOtcTest extends ObsDataSourceTestBase {
+class ObsDataSourceOtcTest extends ObsDataSourceTestBase {
     public static final String OTC_CLOUD_URL = "https://obs.eu-de.otc.t-systems.com";
     public static final String BUCKET_NAME = "obs-sink-itest-" + UUID.randomUUID();
     private ObsClient obsClient;
