@@ -2,14 +2,13 @@ package com.huawei.cloud.transfer.obs;
 
 import com.huawei.cloud.obs.TestFunctions;
 import com.obs.services.ObsClient;
-import org.eclipse.edc.junit.annotations.EndToEndTest;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.TestInfo;
 
 import java.util.UUID;
 
-@EndToEndTest
+@OtcTest
 class ObsDataSinkOtcTest extends ObsDataSinkTestBase {
 
     public static final String OTC_CLOUD_URL = "https://obs.eu-de.otc.t-systems.com";
