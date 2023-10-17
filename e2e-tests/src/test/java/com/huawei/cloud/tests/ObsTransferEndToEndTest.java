@@ -101,15 +101,13 @@ public class ObsTransferEndToEndTest {
         var flowRequest = createFlowRequest(destBucket, consumerEndpoint, srcBucket, TESTFILE_NAME, providerEndpoint).build();
         var url = PROVIDER.getControlEndpoint().getUrl().toString() + "/transfer";
 
-        var response = given().when()
+        given().when()
                 .baseUri(url)
                 .contentType(ContentType.JSON)
                 .body(flowRequest)
                 .post()
-                .then();
-        var body = response.extract().body().asString();
-        System.out.println("BODY: " + body);
-        response.statusCode(200)
+                .then()
+                .statusCode(200)
                 .log().all(true);
 
         await().pollInterval(Duration.ofSeconds(2))
@@ -137,15 +135,13 @@ public class ObsTransferEndToEndTest {
         var flowRequest = createFlowRequest(destBucket, consumerEndpoint, srcBucket, "file", providerEndpoint).build();
         var url = PROVIDER.getControlEndpoint().getUrl().toString() + "/transfer";
 
-        var response = given().when()
+        given().when()
                 .baseUri(url)
                 .contentType(ContentType.JSON)
                 .body(flowRequest)
                 .post()
-                .then();
-        var body = response.extract().body().asString();
-        System.out.println("BODY: " + body);
-        response.statusCode(200)
+                .then()
+                .statusCode(200)
                 .log().all(true);
 
         await().pollInterval(Duration.ofSeconds(2))
