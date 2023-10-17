@@ -13,7 +13,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-java
       - name: End-To-End Tests
-        run: ./gradlew test -DincludeTags="EndToEndTest" -PverboseTest=true
+        run: |
+          ./gradlew compileJava compileTestJava
+          ./gradlew test -DincludeTags="EndToEndTest" -PverboseTest=true
   cloud-test:
     runs-on: ubuntu-latest
     env:
