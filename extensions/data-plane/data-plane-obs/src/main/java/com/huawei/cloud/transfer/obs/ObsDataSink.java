@@ -70,12 +70,6 @@ public class ObsDataSink extends ParallelSink {
         return StreamResult.success();
     }
 
-    @Override
-    protected StreamResult<Object> complete() {
-        return StreamResult.success();
-
-    }
-
     @NotNull
     private StreamResult<Object> uploadFailure(Exception e, String keyName, int partNumber) {
         String msg = e instanceof ObsException ?
@@ -106,7 +100,7 @@ public class ObsDataSink extends ParallelSink {
             return this;
         }
 
-        public Builder keyName(String keyName) {
+        public Builder objectName(String keyName) {
             sink.objectName = keyName;
             return this;
         }

@@ -26,10 +26,12 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.TestInfo;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.lang.reflect.Method;
 import java.util.UUID;
 
+@Testcontainers
 public class ObsDataSourceMinioTest extends ObsDataSourceTestBase {
 
     public static final String MINIO_DOCKER_IMAGE = "bitnami/minio";

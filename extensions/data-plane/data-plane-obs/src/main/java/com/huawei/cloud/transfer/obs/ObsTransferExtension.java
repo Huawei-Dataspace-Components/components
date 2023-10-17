@@ -8,6 +8,8 @@ import org.eclipse.edc.spi.system.ServiceExtension;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;
 import org.eclipse.edc.spi.types.TypeManager;
 
+import java.util.concurrent.Executors;
+
 @Extension(ObsTransferExtension.NAME)
 public class ObsTransferExtension implements ServiceExtension {
 
@@ -26,7 +28,8 @@ public class ObsTransferExtension implements ServiceExtension {
         var sourceFactory = new ObsDataSourceFactory(vault, typeManager);
         pipelineService.registerFactory(sourceFactory);
 
-        var sinkFactory = new ObsDataSinkFactory();
+        var executor = Executors.newFixedThreadPool(10);
+        var sinkFactory = new ObsDataSinkFactory(vault, typeManager, context.getMonitor(), executor);
         pipelineService.registerFactory(sinkFactory);
     }
 

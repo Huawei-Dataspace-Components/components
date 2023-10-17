@@ -29,7 +29,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.File;
 import java.util.stream.Stream;
@@ -39,7 +38,6 @@ import static org.eclipse.edc.junit.testfixtures.TestUtils.getFileFromResourceNa
 
 @SuppressWarnings("ALL") // try-with-resources is not needed here
 @EndToEndTest
-@Testcontainers
 abstract class ObsDataSourceTestBase {
 
     private String bucketName;

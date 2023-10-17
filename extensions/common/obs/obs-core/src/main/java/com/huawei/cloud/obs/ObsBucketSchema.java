@@ -27,5 +27,5 @@ public interface ObsBucketSchema {
     String KEY_PREFIX = "keyPrefix";
     String ACCESS_KEY_ID = "accessKeyId";
     String SECRET_ACCESS_KEY = "secretAccessKey";
-    String ENDPOINT = "endpointOverride";
+    String ENDPOINT = "endpoint";
 }
