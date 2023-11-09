@@ -31,7 +31,7 @@ jobs:
         run: |
           ./gradlew compileJava compileTestJava
           ./gradlew test -DincludeTags="EndToEndTest" -PverboseTest=true
-  cloud-test:
+  obs-otc-test:
     runs-on: ubuntu-latest
     needs: [ secret-presence ]
     if: |
