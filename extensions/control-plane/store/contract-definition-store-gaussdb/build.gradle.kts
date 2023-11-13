@@ -5,10 +5,10 @@ plugins {
 dependencies {
     api(libs.edc.spi.core)
     api(libs.edc.util)
+    api(libs.edc.sql.contractdefstore)
     implementation(libs.failsafe.core)
-    // sql libs
-    implementation(libs.edc.sql.contractdefstore)
     implementation(libs.edc.sql.core)
+    // sql libs
 //    implementation(libs.edc.spi.datasource.transaction)
 
     testImplementation(libs.edc.junit)
