@@ -8,8 +8,6 @@ dependencies {
     api(libs.edc.sql.contractdefstore)
     implementation(libs.failsafe.core)
     implementation(libs.edc.sql.core)
-    // sql libs
-//    implementation(libs.edc.spi.datasource.transaction)
 
     testImplementation(libs.edc.junit)
     testImplementation(libs.junit.jupiter.api)
