@@ -16,8 +16,8 @@ COMMENT ON COLUMN edc_lease.lease_duration IS 'duration of lease in milliseconds
 
 
 -- CREATE UNIQUE INDEX IF NOT EXISTS lease_lease_id_uindex
-CREATE UNIQUE INDEX lease_lease_id_uindex
-    ON edc_lease (lease_id);
+--CREATE UNIQUE INDEX lease_lease_id_uindex
+--    ON edc_lease (lease_id);
 
 
 
@@ -74,13 +74,13 @@ COMMENT ON COLUMN edc_contract_negotiation.trace_context IS 'Map<String,String> 
 
 
 -- CREATE INDEX IF NOT EXISTS contract_negotiation_correlationid_index
-CREATE INDEX contract_negotiation_correlationid_index
-    ON edc_contract_negotiation (correlation_id);
+--CREATE INDEX contract_negotiation_correlationid_index
+--    ON edc_contract_negotiation (correlation_id);
 
 -- CREATE UNIQUE INDEX IF NOT EXISTS contract_negotiation_id_uindex
-CREATE UNIQUE INDEX contract_negotiation_id_uindex
-    ON edc_contract_negotiation (id);
+--CREATE UNIQUE INDEX contract_negotiation_id_uindex
+--    ON edc_contract_negotiation (id);
 
 -- CREATE UNIQUE INDEX IF NOT EXISTS contract_agreement_id_uindex
-CREATE UNIQUE INDEX contract_agreement_id_uindex
-    ON edc_contract_agreement (agr_id);
+--CREATE UNIQUE INDEX contract_agreement_id_uindex
+--    ON edc_contract_agreement (agr_id);
