@@ -747,7 +747,14 @@ class GaussDbContractNegotiationStoreTest {
         negotiations.forEach(getContractNegotiationStore()::save);
 
         // mark a few as "leased"
-        getContractNegotiationStore().nextNotLeased(5, hasState(REQUESTED.code()));
+        var notLeased = getContractNegotiationStore().nextNotLeased(5, hasState(REQUESTED.code()));
+
+        assertThat(notLeased).hasSize(5);
+
+        var notLeasedIds = notLeased.stream()
+                .map(ContractNegotiation::getId)
+                .map(Integer::parseInt)
+                .collect(Collectors.toSet());
 
         var batch2 = getContractNegotiationStore().nextNotLeased(10, hasState(REQUESTED.code()));
         assertThat(batch2)
@@ -755,7 +762,7 @@ class GaussDbContractNegotiationStoreTest {
                 .isSubsetOf(negotiations)
                 .extracting(ContractNegotiation::getId)
                 .map(Integer::parseInt)
-                .allMatch(i -> i >= 5);
+                .allMatch(i -> !notLeasedIds.contains(i));
     }
 
     @Test
