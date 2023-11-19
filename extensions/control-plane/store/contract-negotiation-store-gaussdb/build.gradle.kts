@@ -17,6 +17,6 @@ dependencies {
     testImplementation(libs.testcontainers.junit)
     testImplementation(testFixtures(libs.edc.spi.contract))
     testImplementation(testFixtures(libs.edc.sql.lease))
-    testImplementation(testFixtures(project(":extensions:common:gaussdb:gaussdb-test")))
+    testImplementation(testFixtures(project(":extensions:common:gaussdb:gaussdb-core")))
 
 }

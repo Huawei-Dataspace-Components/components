@@ -6,6 +6,7 @@ dependencies {
     api(libs.edc.spi.core)
     api(libs.edc.util)
     api(libs.edc.sql.transferprocess)
+    api(libs.edc.sql.lease)
     api(libs.huawei.dws.jdbc)
 
     implementation(libs.failsafe.core)
@@ -15,8 +16,8 @@ dependencies {
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.assertj)
     testImplementation(libs.testcontainers.junit)
-    testImplementation(testFixtures(libs.edc.spi.contract))
+    testImplementation(testFixtures(libs.edc.spi.transfer))
     testImplementation(testFixtures(libs.edc.sql.lease))
-    testImplementation(testFixtures(project(":extensions:common:gaussdb:gaussdb-test")))
+    testImplementation(testFixtures(project(":extensions:common:gaussdb:gaussdb-core")))
 
 }
