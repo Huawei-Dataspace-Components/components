@@ -1,7 +1,7 @@
 package com.huawei.cloud.store.gaussdb.contractnegotiationstore;
 
 import com.huawei.cloud.gaussdb.testfixtures.GaussDbTestExtension;
-import org.eclipse.edc.azure.testfixtures.annotations.GaussDbTest;
+import com.huawei.cloud.gaussdb.testfixtures.annotations.GaussDbTest;
 import org.eclipse.edc.connector.contract.spi.ContractOfferId;
 import org.eclipse.edc.connector.contract.spi.negotiation.store.ContractNegotiationStore;
 import org.eclipse.edc.connector.contract.spi.testfixtures.negotiation.store.TestFunctions;

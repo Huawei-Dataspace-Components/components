@@ -1,8 +1,8 @@
 package com.huawei.cloud.store.gaussdb.contractdefinition;
 
 import com.huawei.cloud.gaussdb.testfixtures.GaussDbTestExtension;
+import com.huawei.cloud.gaussdb.testfixtures.annotations.GaussDbTest;
 import org.assertj.core.api.Assertions;
-import org.eclipse.edc.azure.testfixtures.annotations.GaussDbTest;
 import org.eclipse.edc.connector.contract.spi.offer.store.ContractDefinitionStore;
 import org.eclipse.edc.connector.contract.spi.types.offer.ContractDefinition;
 import org.eclipse.edc.connector.store.sql.contractdefinition.SqlContractDefinitionStore;
