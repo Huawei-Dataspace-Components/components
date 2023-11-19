@@ -61,7 +61,7 @@ class GaussDbPolicyDefinitionStoreTest {
 
     @AfterAll
     static void deleteTable(GaussDbTestExtension.SqlHelper runner) {
-//        runner.dropTable(SQL_STATEMENTS.getPolicyTable());
+        runner.dropTable(SQL_STATEMENTS.getPolicyTable());
     }
 
     @BeforeEach

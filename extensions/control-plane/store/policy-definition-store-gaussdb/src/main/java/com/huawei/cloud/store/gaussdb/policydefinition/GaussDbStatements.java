@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 import static java.lang.String.format;
 
 public class GaussDbStatements extends PostgresDialectStatements {
-    
+
     public static final String POLICY_PROHIBITIONS = "policy.prohibitions.";
     public static final String POLICY_PERMISSIONS = "policy.permissions.";
     public static final String POLICY_OBLIGATIONS = "policy.obligations.";
@@ -24,7 +24,7 @@ public class GaussDbStatements extends PostgresDialectStatements {
             POLICY_OBLIGATIONS,
             POLICY_EXTENSIBLE_PROPERTIES);
 
-    public final Map<String, Supplier<String>> PREFIX_COLUMN_MAPPING = Map.of(
+    public final Map<String, Supplier<String>> prefixColumnMapping = Map.of(
             POLICY_PROHIBITIONS, this::getProhibitionsColumn,
             POLICY_OBLIGATIONS, this::getDutiesColumn,
             POLICY_EXTENSIBLE_PROPERTIES, this::getExtensiblePropertiesColumn,
@@ -60,7 +60,7 @@ public class GaussDbStatements extends PostgresDialectStatements {
                                 .findFirst()
                                 .orElseThrow(() -> new EdcPersistenceException(format("Operand left %s not valid for policy filtering", operandLeft)));
 
-                        var column = PREFIX_COLUMN_MAPPING.get(prefix).get();
+                        var column = prefixColumnMapping.get(prefix).get();
                         var sanitizedLeftOp = fc.getOperandLeft().toString().replace(prefix, "");
                         stmt.addWhereClause("? IN (SELECT json_array_elements( %s.%s ) #>> %s)".formatted(getPolicyTable(), column, jsonPathExpression(sanitizedLeftOp)), fc.getOperandRight());
                     });
