@@ -21,7 +21,8 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "components"
-include(":launchers")
+include(":launchers:e2e-test")
+include(":launchers:huawei-cloud-runtime")
 include(":extensions")
 include(":extensions:common:obs:obs-core")
 include(":extensions:control-plane:provision-obs")
@@ -34,4 +35,5 @@ include(":extensions:control-plane:store:contract-negotiation-store-gaussdb")
 include(":extensions:control-plane:store:transfer-process-store-gaussdb")
 include(":extensions:control-plane:store:data-plane-instance-store-gaussdb")
 include(":extensions:common:gaussdb:gaussdb-core")
+include(":extensions:control-plane:store:policy-definition-store-gaussdb")
 include(":e2e-tests")
