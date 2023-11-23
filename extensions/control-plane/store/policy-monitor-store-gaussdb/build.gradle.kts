@@ -17,6 +17,7 @@ dependencies {
     testImplementation(libs.assertj)
     testImplementation(libs.testcontainers.junit)
     testImplementation(testFixtures(libs.edc.sql.lease))
+    testImplementation(testFixtures(libs.edc.spi.policymonitor))
     testImplementation(testFixtures(project(":extensions:common:gaussdb:gaussdb-core")))
 
 }
