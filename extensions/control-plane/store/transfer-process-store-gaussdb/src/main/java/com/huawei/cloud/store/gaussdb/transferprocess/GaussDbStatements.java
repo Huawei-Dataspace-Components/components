@@ -1,7 +1,7 @@
 package com.huawei.cloud.store.gaussdb.transferprocess;
 
-import org.eclipse.edc.connector.store.sql.transferprocess.store.schema.postgres.PostgresDialectStatements;
-import org.eclipse.edc.connector.store.sql.transferprocess.store.schema.postgres.TransferProcessMapping;
+import org.eclipse.edc.connector.controlplane.store.sql.transferprocess.store.schema.postgres.PostgresDialectStatements;
+import org.eclipse.edc.connector.controlplane.store.sql.transferprocess.store.schema.postgres.TransferProcessMapping;
 import org.eclipse.edc.spi.query.Criterion;
 import org.eclipse.edc.spi.query.QuerySpec;
 import org.eclipse.edc.sql.translation.SqlQueryStatement;
@@ -26,7 +26,7 @@ public class GaussDbStatements extends PostgresDialectStatements {
         if (querySpec.containsAnyLeftOperand(RESOURCE_MANIFEST_DEFINITIONS_PREFIX)) {
 
             var filteredCriteria = filterLeftOpNotContains(criteria, RESOURCE_MANIFEST_DEFINITIONS_PREFIX);
-            var stmt = new SqlQueryStatement(getSelectTemplate(), querySpec, new TransferProcessMapping(this));
+            var stmt = new SqlQueryStatement(getSelectTemplate(), querySpec, new TransferProcessMapping(this), operatorTranslator);
 
             filteredCriteria.forEach(fc -> {
                 var sanitizedLeftOp = fc.getOperandLeft().toString().replace(RESOURCE_MANIFEST_DEFINITIONS_PREFIX, "");
@@ -37,7 +37,7 @@ public class GaussDbStatements extends PostgresDialectStatements {
         } else if (querySpec.containsAnyLeftOperand(PROVISIONED_RESOURCE_SET_RESOURCES_PREFIX)) {
 
             var filteredCriteria = filterLeftOpNotContains(criteria, PROVISIONED_RESOURCE_SET_RESOURCES_PREFIX);
-            var stmt = new SqlQueryStatement(getSelectTemplate(), querySpec, new TransferProcessMapping(this));
+            var stmt = new SqlQueryStatement(getSelectTemplate(), querySpec, new TransferProcessMapping(this), operatorTranslator);
             filteredCriteria.forEach(fc -> {
                 var sanitizedLeftOp = fc.getOperandLeft().toString().replace(PROVISIONED_RESOURCE_SET_RESOURCES_PREFIX, "");
                 stmt.addWhereClause("? IN (SELECT json_array_elements((%s.%s ->> '%s')::json) ->> ?)".formatted(getTransferProcessTableName(), getProvisionedResourceSetColumn(), RESOURCES_ALIAS), fc.getOperandRight(),
@@ -46,7 +46,7 @@ public class GaussDbStatements extends PostgresDialectStatements {
             return stmt;
         } else if (querySpec.containsAnyLeftOperand(DEPROVISIONED_RESOURCES_PREFIX)) {
             var filteredCriteria = filterLeftOpNotContains(criteria, DEPROVISIONED_RESOURCES_PREFIX);
-            var stmt = new SqlQueryStatement(getSelectTemplate(), querySpec, new TransferProcessMapping(this));
+            var stmt = new SqlQueryStatement(getSelectTemplate(), querySpec, new TransferProcessMapping(this), operatorTranslator);
             filteredCriteria.forEach(fc -> {
                 var sanitizedLeftOp = fc.getOperandLeft().toString().replace(DEPROVISIONED_RESOURCES_PREFIX, "");
                 stmt.addWhereClause("? IN (SELECT json_array_elements( %s.%s ) ->> ?)".formatted(getTransferProcessTableName(), getDeprovisionedResourcesColumn()), fc.getOperandRight().toString(), sanitizedLeftOp);
@@ -54,12 +54,6 @@ public class GaussDbStatements extends PostgresDialectStatements {
             return stmt;
         }
         return super.createQuery(querySpec);
-    }
-
-    @Override
-    public String getSelectTemplate() {
-        return "SELECT *, drq.%s as edc_data_request_id FROM %s LEFT JOIN %s drq ON %s.%s = drq.%s"
-                .formatted(getDataRequestIdColumn(), getTransferProcessTableName(), getDataRequestTable(), getTransferProcessTableName(), getIdColumn(), getTransferProcessIdFkColumn());
     }
 
     @NotNull

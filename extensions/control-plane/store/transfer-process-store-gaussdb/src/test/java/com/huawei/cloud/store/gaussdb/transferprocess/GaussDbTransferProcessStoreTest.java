@@ -2,21 +2,21 @@ package com.huawei.cloud.store.gaussdb.transferprocess;
 
 import com.huawei.cloud.gaussdb.testfixtures.GaussDbTestExtension;
 import com.huawei.cloud.gaussdb.testfixtures.annotations.GaussDbTest;
-import org.eclipse.edc.connector.store.sql.transferprocess.store.SqlTransferProcessStore;
-import org.eclipse.edc.connector.store.sql.transferprocess.store.schema.postgres.PostgresDialectStatements;
-import org.eclipse.edc.connector.transfer.spi.store.TransferProcessStore;
-import org.eclipse.edc.connector.transfer.spi.testfixtures.store.TestFunctions;
-import org.eclipse.edc.connector.transfer.spi.types.DeprovisionedResource;
-import org.eclipse.edc.connector.transfer.spi.types.ProvisionedResourceSet;
-import org.eclipse.edc.connector.transfer.spi.types.ResourceManifest;
-import org.eclipse.edc.connector.transfer.spi.types.TransferProcess;
+import org.eclipse.edc.connector.controlplane.store.sql.transferprocess.store.SqlTransferProcessStore;
+import org.eclipse.edc.connector.controlplane.store.sql.transferprocess.store.schema.postgres.PostgresDialectStatements;
+import org.eclipse.edc.connector.controlplane.transfer.spi.store.TransferProcessStore;
+import org.eclipse.edc.connector.controlplane.transfer.spi.testfixtures.store.TestFunctions;
+import org.eclipse.edc.connector.controlplane.transfer.spi.types.DeprovisionedResource;
+import org.eclipse.edc.connector.controlplane.transfer.spi.types.ProvisionedResourceSet;
+import org.eclipse.edc.connector.controlplane.transfer.spi.types.ResourceManifest;
+import org.eclipse.edc.connector.controlplane.transfer.spi.types.TransferProcess;
+import org.eclipse.edc.json.JacksonTypeManager;
 import org.eclipse.edc.junit.assertions.AbstractResultAssert;
 import org.eclipse.edc.policy.model.PolicyRegistrationTypes;
 import org.eclipse.edc.spi.query.Criterion;
 import org.eclipse.edc.spi.query.QuerySpec;
 import org.eclipse.edc.spi.query.SortOrder;
 import org.eclipse.edc.spi.result.StoreFailure;
-import org.eclipse.edc.spi.types.TypeManager;
 import org.eclipse.edc.spi.types.domain.callback.CallbackAddress;
 import org.eclipse.edc.sql.QueryExecutor;
 import org.eclipse.edc.sql.lease.testfixtures.LeaseUtil;
@@ -44,16 +44,12 @@ import static com.huawei.cloud.gaussdb.testfixtures.GaussDbTestExtension.DEFAULT
 import static java.util.stream.IntStream.range;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.eclipse.edc.connector.transfer.spi.testfixtures.store.TestFunctions.createDataAddressBuilder;
-import static org.eclipse.edc.connector.transfer.spi.testfixtures.store.TestFunctions.createDataRequest;
-import static org.eclipse.edc.connector.transfer.spi.testfixtures.store.TestFunctions.createDataRequestBuilder;
-import static org.eclipse.edc.connector.transfer.spi.testfixtures.store.TestFunctions.createTransferProcess;
-import static org.eclipse.edc.connector.transfer.spi.testfixtures.store.TestFunctions.createTransferProcessBuilder;
-import static org.eclipse.edc.connector.transfer.spi.testfixtures.store.TestFunctions.initialTransferProcess;
-import static org.eclipse.edc.connector.transfer.spi.types.TransferProcessStates.INITIAL;
-import static org.eclipse.edc.connector.transfer.spi.types.TransferProcessStates.PROVISIONING;
-import static org.eclipse.edc.connector.transfer.spi.types.TransferProcessStates.STARTED;
-import static org.eclipse.edc.connector.transfer.spi.types.TransferProcessStates.TERMINATED;
+import static org.eclipse.edc.connector.controlplane.transfer.spi.testfixtures.store.TestFunctions.createTransferProcess;
+import static org.eclipse.edc.connector.controlplane.transfer.spi.testfixtures.store.TestFunctions.createTransferProcessBuilder;
+import static org.eclipse.edc.connector.controlplane.transfer.spi.types.TransferProcessStates.INITIAL;
+import static org.eclipse.edc.connector.controlplane.transfer.spi.types.TransferProcessStates.PROVISIONING;
+import static org.eclipse.edc.connector.controlplane.transfer.spi.types.TransferProcessStates.STARTED;
+import static org.eclipse.edc.connector.controlplane.transfer.spi.types.TransferProcessStates.TERMINATED;
 import static org.eclipse.edc.spi.persistence.StateEntityStore.hasState;
 import static org.eclipse.edc.spi.result.StoreFailure.Reason.ALREADY_LEASED;
 import static org.eclipse.edc.spi.result.StoreFailure.Reason.NOT_FOUND;
@@ -72,7 +68,7 @@ class GaussDbTransferProcessStoreTest {
     @BeforeEach
     void setUp(GaussDbTestExtension extension, GaussDbTestExtension.SqlHelper helper, QueryExecutor queryExecutor) {
         var clock = Clock.systemUTC();
-        var typeManager = new TypeManager();
+        var typeManager = new JacksonTypeManager();
         typeManager.registerTypes(TestFunctions.TestResourceDef.class, TestFunctions.TestProvisionedResource.class);
         typeManager.registerTypes(PolicyRegistrationTypes.TYPES.toArray(Class<?>[]::new));
 
@@ -82,14 +78,13 @@ class GaussDbTransferProcessStoreTest {
         leaseUtil = new LeaseUtil(extension.getTransactionContext(), extension::newConnection, SQL_STATEMENTS, clock);
 
         helper.truncateTable(SQL_STATEMENTS.getTransferProcessTableName());
-        helper.truncateTable(SQL_STATEMENTS.getDataRequestTable());
         helper.truncateTable(SQL_STATEMENTS.getLeaseTableName());
     }
 
     @Test
     void create_shouldCreateTheEntity() {
         var transferProcess = createTransferProcessBuilder("test-id")
-                .dataRequest(createDataRequestBuilder().id("data-request-id").build())
+                .correlationId("data-request-id")
                 .privateProperties(Map.of("key", "value")).build();
         getTransferProcessStore().save(transferProcess);
 
@@ -250,7 +245,7 @@ class GaussDbTransferProcessStoreTest {
 
     @Test
     void nextNotLeased_shouldLeaseEntityUntilUpdate() {
-        var initialTransferProcess = initialTransferProcess();
+        var initialTransferProcess = TestFunctions.initialTransferProcess();
         getTransferProcessStore().save(initialTransferProcess);
 
         var firstQueryResult = getTransferProcessStore().nextNotLeased(1, hasState(INITIAL.code()));
@@ -302,8 +297,7 @@ class GaussDbTransferProcessStoreTest {
 
     @Test
     void findForCorrelationId_shouldFindEntityByCorrelationId() {
-        var dataRequest = createDataRequestBuilder().id("correlationId").build();
-        var transferProcess = createTransferProcessBuilder("id1").dataRequest(dataRequest).build();
+        var transferProcess = createTransferProcessBuilder("id1").correlationId("correlationId").build();
         getTransferProcessStore().save(transferProcess);
 
         var res = getTransferProcessStore().findForCorrelationId("correlationId");
@@ -372,36 +366,6 @@ class GaussDbTransferProcessStoreTest {
 
         // leased by someone else -> throw exception
         assertThatThrownBy(() -> getTransferProcessStore().save(t1)).isInstanceOf(IllegalStateException.class);
-    }
-
-    @Test
-    void update_dataRequestWithNewId_replacesOld() {
-        var bldr = createTransferProcessBuilder("id1").state(STARTED.code());
-        var t1 = bldr.build();
-        getTransferProcessStore().save(t1);
-
-        var t2 = bldr
-                .dataRequest(createDataRequestBuilder()
-                        .id("new-dr-id")
-                        .assetId("new-asset")
-                        .contractId("new-contract")
-                        .protocol("test-protocol")
-                        .connectorAddress("new-connector")
-                        .build())
-                .build();
-        getTransferProcessStore().save(t2);
-
-        var all = getTransferProcessStore().findAll(QuerySpec.none()).collect(Collectors.toList());
-        assertThat(all)
-                .hasSize(1)
-                .usingRecursiveFieldByFieldElementComparator()
-                .containsExactly(t2);
-
-
-        var drs = all.stream().map(TransferProcess::getDataRequest).collect(Collectors.toList());
-        assertThat(drs).hasSize(1)
-                .usingRecursiveFieldByFieldElementComparator()
-                .containsOnly(t2.getDataRequest());
     }
 
     @Test
@@ -530,7 +494,7 @@ class GaussDbTransferProcessStoreTest {
 
     @Test
     void findAll_queryByDataAddressProperty() {
-        var da = createDataAddressBuilder("test-type")
+        var da = TestFunctions.createDataAddressBuilder("test-type")
                 .property("key", "value")
                 .build();
         var tp = createTransferProcessBuilder("testprocess1")
@@ -550,7 +514,7 @@ class GaussDbTransferProcessStoreTest {
 
     @Test
     void findAll_queryByDataAddress_propNotExist() {
-        var da = createDataAddressBuilder("test-type")
+        var da = TestFunctions.createDataAddressBuilder("test-type")
                 .property("key", "value")
                 .build();
         var tp = createTransferProcessBuilder("testprocess1")
@@ -568,7 +532,7 @@ class GaussDbTransferProcessStoreTest {
 
     @Test
     void findAll_queryByDataAddress_invalidKey_valueNotExist() {
-        var da = createDataAddressBuilder("test-type")
+        var da = TestFunctions.createDataAddressBuilder("test-type")
                 .property("key", "value")
                 .build();
         var tp = createTransferProcessBuilder("testprocess1")
@@ -586,9 +550,8 @@ class GaussDbTransferProcessStoreTest {
 
     @Test
     void findAll_queryByDataRequestProperty_processId() {
-        var da = createDataRequest();
         var tp = createTransferProcessBuilder("testprocess1")
-                .dataRequest(da)
+                .correlationId("")
                 .build();
         getTransferProcessStore().save(tp);
         getTransferProcessStore().save(createTransferProcess("testprocess2"));
@@ -603,34 +566,15 @@ class GaussDbTransferProcessStoreTest {
     }
 
     @Test
-    void findAll_queryByDataRequestProperty_id() {
-        var da = createDataRequest();
-        var tp = createTransferProcessBuilder("testprocess1")
-                .dataRequest(da)
-                .build();
-        getTransferProcessStore().save(tp);
-        getTransferProcessStore().save(createTransferProcess("testprocess2"));
-
-        var query = QuerySpec.Builder.newInstance()
-                .filter(List.of(new Criterion("dataRequest.id", "=", da.getId())))
-                .build();
-
-        var result = getTransferProcessStore().findAll(query);
-
-        assertThat(result).usingRecursiveFieldByFieldElementComparatorIgnoringFields("deprovisionedResources").containsOnly(tp);
-    }
-
-    @Test
     void findAll_queryByDataRequestProperty_protocol() {
-        var da = createDataRequestBuilder().protocol("%/protocol").build();
         var tp = createTransferProcessBuilder("testprocess1")
-                .dataRequest(da)
+                .protocol("test-protocol")
                 .build();
         getTransferProcessStore().save(tp);
         getTransferProcessStore().save(createTransferProcess("testprocess2"));
 
         var query = QuerySpec.Builder.newInstance()
-                .filter(List.of(new Criterion("dataRequest.protocol", "like", "%/protocol")))
+                .filter(List.of(new Criterion("protocol", "like", "test-protocol")))
                 .build();
 
         var result = getTransferProcessStore().findAll(query);
@@ -640,9 +584,7 @@ class GaussDbTransferProcessStoreTest {
 
     @Test
     void findAll_queryByDataRequest_valueNotExist() {
-        var da = createDataRequest();
         var tp = createTransferProcessBuilder("testprocess1")
-                .dataRequest(da)
                 .build();
         getTransferProcessStore().save(tp);
         getTransferProcessStore().save(createTransferProcess("testprocess2"));
@@ -953,8 +895,7 @@ class GaussDbTransferProcessStoreTest {
     void findByCorrelationIdAndLease_shouldReturnTheEntityAndLeaseIt() {
         var id = UUID.randomUUID().toString();
         var correlationId = UUID.randomUUID().toString();
-        var dataRequest = createDataRequestBuilder().id(correlationId).build();
-        getTransferProcessStore().save(createTransferProcessBuilder(id).dataRequest(dataRequest).build());
+        getTransferProcessStore().save(createTransferProcessBuilder(id).correlationId(correlationId).build());
 
         var result = getTransferProcessStore().findByCorrelationIdAndLease(correlationId);
 
@@ -973,8 +914,7 @@ class GaussDbTransferProcessStoreTest {
     void findByCorrelationIdAndLease_shouldReturnAlreadyLeased_whenEntityIsAlreadyLeased() {
         var id = UUID.randomUUID().toString();
         var correlationId = UUID.randomUUID().toString();
-        var dataRequest = createDataRequestBuilder().id(correlationId).build();
-        getTransferProcessStore().save(createTransferProcessBuilder(id).dataRequest(dataRequest).build());
+        getTransferProcessStore().save(createTransferProcessBuilder(id).correlationId(correlationId).build());
         leaseEntity(id, "other owner");
 
         var result = getTransferProcessStore().findByCorrelationIdAndLease(correlationId);
@@ -991,7 +931,6 @@ class GaussDbTransferProcessStoreTest {
     @AfterAll
     static void deleteTable(GaussDbTestExtension.SqlHelper runner) {
         runner.dropTable(SQL_STATEMENTS.getTransferProcessTableName());
-        runner.dropTable(SQL_STATEMENTS.getDataRequestTable());
         runner.dropTable(SQL_STATEMENTS.getLeaseTableName());
     }
 
