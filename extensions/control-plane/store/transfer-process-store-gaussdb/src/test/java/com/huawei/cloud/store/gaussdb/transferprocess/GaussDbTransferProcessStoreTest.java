@@ -109,6 +109,28 @@ class GaussDbTransferProcessStoreTest {
     }
 
     @Test
+    void create_verifyTransferType() {
+        var t = TestFunctions.createTransferProcessBuilder("test-id").transferType("transferType").build();
+        getTransferProcessStore().save(t);
+
+        var all = getTransferProcessStore().findAll(QuerySpec.none()).collect(Collectors.toList());
+        assertThat(all).containsExactly(t);
+        assertThat(all.get(0)).usingRecursiveComparison().isEqualTo(t);
+        assertThat(all.get(0).getTransferType()).isEqualTo("transferType");
+    }
+
+    @Test
+    void create_verifyDataPlaneId() {
+        var t = TestFunctions.createTransferProcessBuilder("test-id").dataPlaneId("dataPlaneId").build();
+        getTransferProcessStore().save(t);
+
+        var all = getTransferProcessStore().findAll(QuerySpec.none()).collect(Collectors.toList());
+        assertThat(all).containsExactly(t);
+        assertThat(all.get(0)).usingRecursiveComparison().isEqualTo(t);
+        assertThat(all.get(0).getDataPlaneId()).isEqualTo("dataPlaneId");
+    }
+
+    @Test
     void create_withSameIdExists_shouldReplace() {
         var t = createTransferProcess("id1", INITIAL);
         getTransferProcessStore().save(t);
@@ -278,6 +300,7 @@ class GaussDbTransferProcessStoreTest {
         assertThat(list1).isNotEqualTo(list2).doesNotContainAnyElementsOf(list2);
     }
 
+
     @Test
     void findById_shouldFindEntityById() {
         var t = createTransferProcess("id1");
@@ -369,6 +392,24 @@ class GaussDbTransferProcessStoreTest {
     }
 
     @Test
+    void update_shouldReplaceDataRequest_whenItGetsTheIdUpdated() {
+        var builder = TestFunctions.createTransferProcessBuilder("id1").state(STARTED.code());
+        getTransferProcessStore().save(builder.build());
+        var newTransferProcess = builder.correlationId("new-dr-id")
+                .assetId("new-asset")
+                .contractId("new-contract")
+                .protocol("test-protocol").build();
+        getTransferProcessStore().save(newTransferProcess);
+
+        var result = getTransferProcessStore().findAll(QuerySpec.none());
+
+        assertThat(result)
+                .hasSize(1)
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(newTransferProcess);
+    }
+
+    @Test
     void delete_shouldDeleteTheEntityById() {
         var t1 = createTransferProcess("id1");
         getTransferProcessStore().save(t1);
@@ -442,6 +483,18 @@ class GaussDbTransferProcessStoreTest {
 
         var result = getTransferProcessStore().findAll(query).toList();
         assertThat(result).hasSize(1).usingRecursiveFieldByFieldElementComparator().containsExactly(tp);
+    }
+
+    @Test
+    void findAll_queryByTransferType() {
+        range(0, 10).forEach(i -> getTransferProcessStore().save(TestFunctions.createTransferProcessBuilder("test-tp-" + i)
+                .transferType("type" + i)
+                .build()));
+        var querySpec = QuerySpec.Builder.newInstance().filter(Criterion.criterion("transferType", "=", "type4")).build();
+
+        var result = getTransferProcessStore().findAll(querySpec);
+
+        assertThat(result).extracting(TransferProcess::getTransferType).containsOnly("type4");
     }
 
     @Test
@@ -549,15 +602,15 @@ class GaussDbTransferProcessStoreTest {
     }
 
     @Test
-    void findAll_queryByDataRequestProperty_processId() {
-        var tp = createTransferProcessBuilder("testprocess1")
-                .correlationId("")
+    void findAll_queryByCorrelationId() {
+        var tp = TestFunctions.createTransferProcessBuilder("testprocess1")
+                .correlationId("counterPartyId")
                 .build();
         getTransferProcessStore().save(tp);
-        getTransferProcessStore().save(createTransferProcess("testprocess2"));
+        getTransferProcessStore().save(TestFunctions.createTransferProcess("testprocess2"));
 
         var query = QuerySpec.Builder.newInstance()
-                .filter(List.of(new Criterion("dataRequest.processId", "=", "testprocess1")))
+                .filter(List.of(new Criterion("correlationId", "=", "counterPartyId")))
                 .build();
 
         var result = getTransferProcessStore().findAll(query);
@@ -879,6 +932,7 @@ class GaussDbTransferProcessStoreTest {
 
         AbstractResultAssert.assertThat(result).isFailed().extracting(StoreFailure::getReason).isEqualTo(NOT_FOUND);
     }
+
 
     @Test
     void findByIdAndLease_shouldReturnAlreadyLeased_whenEntityIsAlreadyLeased() {
